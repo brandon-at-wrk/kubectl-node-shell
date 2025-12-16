@@ -2,7 +2,7 @@
 set -e
 
 kubectl=kubectl
-version=1.11.0
+version=1.11.1
 generator=""
 node=""
 nodefaultctx=0
@@ -21,6 +21,7 @@ use_mount=true
 use_pid=true
 use_net=true
 use_uts=true
+priority_class=""
 
 if [ -t 0 ]; then
   tty=true
@@ -101,6 +102,15 @@ while [ $# -gt 0 ]; do
     ;;
   --no-uts)
     use_uts=false
+    shift
+    ;;
+  --priority-class)
+    priority_class="$2"
+    shift
+    shift
+    ;;
+  --priority-class=*)
+    priority_class="${key##*=}"
     shift
     ;;
   --)
@@ -217,6 +227,7 @@ cat <<EOT
     "hostIPC": $use_ipc,
     "hostNetwork": $use_net,
     "imagePullSecrets": $image_pull_secrets,
+    "priorityClassName": "$priority_class",
     "containers": [
       {
         "securityContext": $security_context,
